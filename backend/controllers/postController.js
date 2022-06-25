@@ -132,6 +132,7 @@ exports.updateCaption = async (req, res) => {
         post.caption = req.body.caption;
         
         await post.save();
+        
         res.status(200).json({
             success: true,
             message: 'Post updated',
@@ -143,3 +144,24 @@ exports.updateCaption = async (req, res) => {
         });
     }
 };
+
+exports.getPostOfFollowing = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id);
+
+        const posts = await Post.find({
+            owner: {
+                $in: user.following
+            }
+        });
+        res.status(200).json({
+            success: true,
+            posts
+        })
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+}
