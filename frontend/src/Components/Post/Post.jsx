@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Link } from 'react-router-dom';
 import {
     MoreVert,
@@ -10,6 +10,14 @@ import {
 import { Avatar, Button, Typography, Dialog } from "@mui/material";
 import User from '../User/User';
 import CommentCard from '../CommentCard/CommentCard';
+import {
+    addCommentOnPost,
+    deletePost,
+    likePost,
+    updatePost,
+} from '../../Actions/postAction';
+import { getFollowingPosts, getMyPosts, loadUser } from '../../Actions/userAction';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Post = ({
     postId,
@@ -31,9 +39,52 @@ const Post = ({
     const [captionValue, setCaptionValue] = useState(caption);
     const [captionToggle, setCaptionToggle] = useState(false);
 
+    
+    const dispatch = useDispatch();
+    const { user } = useSelector((state) => state.user);
+
     const handleLike = () => {
         setLiked(!liked);
+
+        dispatch(likePost(postId))
+
+        if (isAccount) {
+            dispatch(getMyPosts());
+        } else {
+            dispatch(getFollowingPosts());
+        }
     };
+
+    const addCommentHandler = (e) => {
+        e.preventDefault();
+        dispatch(addCommentOnPost(postId, commentValue));
+
+        if (isAccount) {
+            dispatch(getMyPosts());
+        } else {
+            dispatch(getFollowingPosts());
+        }
+    };
+
+    const updateCaptionHandler = (e) => {
+        e.preventDefault();
+        dispatch(updatePost(captionValue, postId));
+        dispatch(getMyPosts());
+    };
+
+    const deletePostHandler = async () => {
+        await dispatch(deletePost(postId));
+        dispatch(getMyPosts());
+        dispatch(loadUser());
+    };
+
+    useEffect(() => {
+        likes.forEach((item) => {
+            if (item._id === user._id) {
+                setLiked(true);
+            }
+        });
+    }, [likes, user._id]);
 
     return (
         <div className="post">
