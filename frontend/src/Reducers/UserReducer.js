@@ -1,8 +1,6 @@
-import { createReducer } from "@reduxjs/toolkit";
+import { createReducer } from '@reduxjs/toolkit';
 
-const initialState = {
-    isAuthenticated: false
-};
+const initialState = {};
 
 export const userReducer = createReducer(initialState, {
     LoginRequest: (state) => {
@@ -46,6 +44,21 @@ export const userReducer = createReducer(initialState, {
         state.error = action.payload;
         state.isAuthenticated = false;
     },
+
+    LogoutUserRequest: (state) => {
+        state.loading = true;
+    },
+    LogoutUserSuccess: (state) => {
+        state.loading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+    },
+    LogoutUserFailure: (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.isAuthenticated = true;
+    },
+
     clearErrors: (state) => {
         state.error = null;
     },
@@ -53,7 +66,7 @@ export const userReducer = createReducer(initialState, {
 
 export const postOfFollowingReducer = createReducer(initialState, {
     postOfFollowingRequest: (state) => {
-        state.loading = true
+        state.loading = true;
     },
     postOfFollowingSuccess: (state, action) => {
         state.loading = false;
@@ -62,10 +75,10 @@ export const postOfFollowingReducer = createReducer(initialState, {
     postOfFollowingFailure: (state, action) => {
         state.loading = false;
         state.error = action.payload;
-     },
+    },
     clearErrors: (state) => {
         state.error = null;
-    }
+    },
 });
 
 export const allUsersReducer = createReducer(initialState, {
@@ -74,9 +87,26 @@ export const allUsersReducer = createReducer(initialState, {
     },
     allUsersSuccess: (state, action) => {
         state.loading = false;
-        state.posts = action.payload;
+        state.users = action.payload;
     },
     allUsersFailure: (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+    },
+    clearErrors: (state) => {
+        state.error = null;
+    },
+});
+
+export const userProfileReducer = createReducer(initialState, {
+    userProfileRequest: (state) => {
+        state.loading = true;
+    },
+    userProfileSuccess: (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+    },
+    userProfileFailure: (state, action) => {
         state.loading = false;
         state.error = action.payload;
     },

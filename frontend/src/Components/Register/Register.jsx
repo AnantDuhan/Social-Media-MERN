@@ -1,10 +1,10 @@
 import { Avatar, Typography, Button } from '@mui/material';
-import React, { useState } from 'react';
-// import { useDispatch, useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import './Register.css';
-// import { registerUser } from '../../Actions/User';
-// import { useAlert } from 'react-alert';
+import { registerUser } from '../../Actions/userAction';
+import { toast } from 'react-toastify';
 
 const Register = () => {
     const [name, setName] = useState('');
@@ -12,35 +12,34 @@ const Register = () => {
     const [avatar, setAvatar] = useState('');
     const [password, setPassword] = useState('');
 
-    // const dispatch = useDispatch();
-    // const alert = useAlert();
-    // const { loading, error } = useSelector((state) => state.user);
+    const dispatch = useDispatch();
+    const { error } = useSelector((state) => state.user);
 
     const handleImageChange = (e) => {
-        // const file = e.target.files[0];
+        const file = e.target.files[0];
 
-        // const Reader = new FileReader();
-        // Reader.readAsDataURL(file);
+        const Reader = new FileReader();
+        Reader.readAsDataURL(file);
 
-        // Reader.onload = () => {
-        //     if (Reader.readyState === 2) {
-        //         setAvatar(Reader.result);
-        //     }
-        // };
+        Reader.onload = () => {
+            if (Reader.readyState === 2) {
+                setAvatar(Reader.result);
+            }
+        };
         e.preventDefault();
     };
 
     const submitHandler = (e) => {
         e.preventDefault();
-        // dispatch(registerUser(name, email, password, avatar));
+        dispatch(registerUser(name, email, password, avatar));
     };
 
-    // useEffect(() => {
-    //     if (error) {
-    //         alert.error(error);
-    //         dispatch({ type: 'clearErrors' });
-    //     }
-    // }, [dispatch, error, alert]);
+    useEffect(() => {
+        if (error) {
+            toast.error(error);
+            dispatch({ type: 'clearErrors' });
+        }
+    }, [dispatch, error]);
     return (
         <div className="register">
             <form className="registerForm" onSubmit={submitHandler}>
