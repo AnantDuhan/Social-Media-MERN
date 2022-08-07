@@ -10,6 +10,7 @@ if (process.env.NODE_ENV !== 'production') {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
 // importing routes 
 const postRoute = require('./routes/postRoute');
 const userRoute = require('./routes/userRoute');
@@ -17,6 +18,5 @@ const userRoute = require('./routes/userRoute');
 // using routes
 app.use('/api/v1', postRoute);
 app.use('/api/v1', userRoute);
-
 
 module.exports = app;
