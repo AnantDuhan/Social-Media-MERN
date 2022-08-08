@@ -30,7 +30,7 @@ exports.register = async (req, res) => {
                 avatar: user.avatar,
                 tasks: user.tasks,
             },
-            process.env.JWT_SECRET_KEY
+            process.env.JWT_SECRET
         );
 
         const options = {
@@ -79,7 +79,7 @@ exports.login = async (req, res) => {
                 avatar: user.avatar,
                 tasks: user.tasks,
             },
-            process.env.JWT_SECRET_KEY
+            process.env.JWT_SECRET
         );
 
         const options = {
