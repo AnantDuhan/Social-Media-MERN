@@ -20,9 +20,25 @@ exports.register = async (req, res) => {
                 public_id: "sample id",
                 url: 'sample url'
             }
-        })
+        });
 
-        res.status(201).json({
+        let token = jwt.sign(
+            {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                avatar: user.avatar,
+                tasks: user.tasks,
+            },
+            process.env.JWT_SECRET_KEY
+        );
+
+        const options = {
+            expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+            httpOnly: true,
+        };
+
+        res.status(201).cookie("token", token, options).json({
             success: true,
             user
         })
@@ -55,11 +71,21 @@ exports.login = async (req, res) => {
             });
         }
 
-        const token = await user.generateToken();
+        let token = jwt.sign(
+            {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                avatar: user.avatar,
+                tasks: user.tasks,
+            },
+            process.env.JWT_SECRET_KEY
+        );
 
-        const options = { 
-            expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), httpOnly: true
-        }
+        const options = {
+            expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+            httpOnly: true,
+        };
 
         res.status(201).cookie("token", token, options).json({
             success: true,

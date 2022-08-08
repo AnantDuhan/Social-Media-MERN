@@ -19,4 +19,8 @@ const userRoute = require('./routes/userRoute');
 app.use('/api/v1', postRoute);
 app.use('/api/v1', userRoute);
 
+app.get('/', (req, res) => {
+    res.send('Server is working');
+});
+
 module.exports = app;
