@@ -14,6 +14,7 @@ const {
     resetPassword,
     getMyPosts,
     getUserPosts,
+    isUserBlocked,
 } = require('../controllers/userController');
 const { isAuthenticated } = require('../middlewares/auth');
 const router = express.Router();
@@ -45,5 +46,7 @@ router.route('/password/reset/:token').put(resetPassword);
 router.route('/my/posts').get(isAuthenticated, getMyPosts);
 
 router.route('/userposts/:id').get(isAuthenticated, getUserPosts);
+
+// router.route('/update/profile/:id').put(isAuthenticated, isUserBlocked);
 
 module.exports = router;

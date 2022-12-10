@@ -1,6 +1,7 @@
 const User = require('../models/UserModel');
 const Post = require('../models/PostModel');
 const { sendEmail } = require('../helper/sendMail');
+const jwt = require('jsonwebtoken');
 
 exports.register = async (req, res) => {
     try {
@@ -86,6 +87,13 @@ exports.login = async (req, res) => {
             expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
             httpOnly: true,
         };
+
+        if (user.isBlocked === true) {
+            return res.status(400).json({
+                success: false,
+                message: `User is Blocked, can't login`,
+            });
+        }
 
         res.status(201).cookie("token", token, options).json({
             success: true,
@@ -478,3 +486,33 @@ exports.getUserPosts = async (req, res) => {
         });
     }
 };
+
+// exports.isUserBlocked = async (req, res) => {
+//     try {
+//         const user = await User.findByIdAndUpdate(req.params.id);
+
+//         const isBlocked = req.body;
+
+//         if (isBlocked) {
+//             user.isBlocked = isBlocked;
+//         }
+
+//         if (!user) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: 'User not found',
+//             });
+//         }
+
+//         res.status(200).json({
+//             success: true,
+//             message: 'User is Blocked Now',
+//         });
+
+//     } catch (error) {
+//         res.status(500).json({
+//             success: false,
+//             message: error.message,
+//         });
+//     }
+// };
