@@ -12,6 +12,7 @@ const Register = () => {
     const [avatar, setAvatar] = useState('');
     const [password, setPassword] = useState('');
 
+    // const navigate = useNavigate();
     const dispatch = useDispatch();
     const { error } = useSelector((state) => state.user);
 
@@ -31,6 +32,7 @@ const Register = () => {
 
     const submitHandler = (e) => {
         e.preventDefault();
+        // navigate('/verify')
         dispatch(registerUser(name, email, password, avatar));
     };
 

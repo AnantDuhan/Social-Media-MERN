@@ -125,6 +125,7 @@ export const likeReducer = createReducer(initialState, {
 
     resetPasswordRequest: (state) => {
         state.loading = true;
+        state.error = null;
     },
     resetPasswordSuccess: (state, action) => {
         state.loading = false;

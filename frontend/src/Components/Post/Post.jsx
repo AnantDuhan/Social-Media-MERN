@@ -18,6 +18,7 @@ import {
 } from '../../Actions/postAction';
 import { getFollowingPosts, getMyPosts, loadUser } from '../../Actions/userAction';
 import { useDispatch, useSelector } from 'react-redux';
+import './Post.css';
 
 const Post = ({
     postId,

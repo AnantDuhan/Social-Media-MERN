@@ -68,6 +68,7 @@ const Home = () => {
                     ) : (
                         <Typography variant="h6">No posts yet</Typography>
                     )}
+                    {console.log("->", posts)}
                 </div>
                 <div className="homeRight">
                     {users && users.length > 0 ? (
@@ -76,9 +77,7 @@ const Home = () => {
                         key={user._id}
                         userId={user._id}
                         name={user.name}
-                        avatar={
-                            'https://avatars.githubusercontent.com/u/50514029?v=4'
-                        }
+                        avatar={user.avatar.url}
                     />
                     ))
                 ) : (

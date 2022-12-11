@@ -85,7 +85,7 @@ const Account = () => {
                     src={user.user.avatar.url}
                     sx={{ height: '8vmax', width: '8vmax' }}
                 />
-                {/* {console.log('DP', user.user.avatar.url)} */}
+                {console.log('DP', user.user.avatar.url)}
                 <Typography variant="h5">{user.user.name}</Typography>
 
                 <div>
@@ -135,7 +135,7 @@ const Account = () => {
                         <Typography variant="h4">Followers</Typography>
 
                         {user && user.user.followers?.length > 0 ? (
-                            user.followers.map((follower) => (
+                            user.followers?.map((follower) => (
                                 <User
                                     key={follower._id}
                                     userId={follower._id}
@@ -159,7 +159,7 @@ const Account = () => {
                         <Typography variant="h4">Following</Typography>
 
                         {user && user.user.following?.length > 0 ? (
-                            user.following.map((follow) => (
+                            user.following?.map((follow) => (
                                 <User
                                     key={follow._id}
                                     userId={follow._id}

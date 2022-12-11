@@ -1,22 +1,48 @@
 import axios from 'axios';
 
+export const registerUser =
+    (name, email, password, avatar) => async (dispatch) => {
+        try {
+            dispatch({
+                type: 'RegisterRequest',
+            });
+
+            const { data } = await axios.post(
+                '/api/v1/register',
+                { name, email, password, avatar },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+
+            dispatch({
+                type: 'RegisterSuccess',
+                payload: data.user,
+            });
+        } catch (error) {
+            dispatch({
+                type: 'RegisterFailure',
+                payload: error.response.data.message,
+            });
+        }
+    };
+
 export const loginUser = (email, password) => async (dispatch) => {
     try {
-        dispatch({
-            type: 'LoginRequest',
-        });
-        
+        dispatch({ type: 'LoginRequest' });
+
+        const config = {
+            headers: { 'Content-Type': 'application/json' },
+        };
+
         const { data } = await axios.post(
-            '/api/v1/login',
+            `/api/v1/login`,
             { email, password },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }
-            );
+            {config}
+        );
             
-        // console.log("CHECK1")
         dispatch({
             type: 'LoginSuccess',
             payload: data.user,
@@ -24,6 +50,21 @@ export const loginUser = (email, password) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: 'LoginFailure',
+            payload: error.response.data.message,
+        });
+    }
+};
+
+export const logoutUser = () => async (dispatch) => {
+    try {
+        dispatch({ type: 'LogoutUserRequest' });
+
+        await axios.get('/api/v1/logout');
+
+        dispatch({ type: 'LogoutUserSuccess' });
+    } catch (error) {
+        dispatch({
+            type: 'LogoutUserFailure',
             payload: error.response.data.message,
         });
     }
@@ -39,7 +80,7 @@ export const loadUser = () => async (dispatch) => {
 
         dispatch({
             type: 'LoadUserSuccess',
-            payload: data.user,
+            payload: data,
         });
     } catch (error) {
         dispatch({
@@ -103,54 +144,6 @@ export const getAllUsers =
         } catch (error) {
             dispatch({
                 type: 'allUsersFailure',
-                payload: error.response.data.message,
-            });
-        }
-    };
-
-export const logoutUser = () => async (dispatch) => {
-    try {
-        dispatch({
-            type: 'LogoutUserRequest',
-        });
-
-        await axios.get('/api/v1/logout');
-
-        dispatch({
-            type: 'LogoutUserSuccess',
-        });
-    } catch (error) {
-        dispatch({
-            type: 'LogoutUserFailure',
-            payload: error.response.data.message,
-        });
-    }
-};
-
-export const registerUser =
-    (name, email, password, avatar) => async (dispatch) => {
-        try {
-            dispatch({
-                type: 'RegisterRequest',
-            });
-
-            const { data } = await axios.post(
-                '/api/v1/register',
-                { name, email, password, avatar },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
-
-            dispatch({
-                type: 'RegisterSuccess',
-                payload: data.user,
-            });
-        } catch (error) {
-            dispatch({
-                type: 'RegisterFailure',
                 payload: error.response.data.message,
             });
         }
@@ -272,7 +265,7 @@ export const resetPassword = (token, password) => async (dispatch) => {
         const { data } = await axios.put(
             `/api/v1/password/reset/${token}`,
             {
-                password,
+                password
             },
             {
                 headers: {
