@@ -45,11 +45,11 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    otp: {
-        type: Number,
-        minValue: 1000001,
-    },
-    otp_expiry: Date,
+    // otp: {
+    //     type: Number,
+    //     minValue: 1000001,
+    // },
+    // otp_expiry: Date,
     resetPasswordToken: String,
     resetPasswordExpire: Date,
 });
