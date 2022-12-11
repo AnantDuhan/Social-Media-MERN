@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
+const fileupload = require('express-fileupload'); 
 
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config({ path: 'backend/config/config.env' });
@@ -21,6 +22,7 @@ app.use(
         parameterLimit: 50000,
     })
 );
+app.use(fileupload({ useTempFiles: true }));
 
 // importing routes 
 const postRoute = require('./routes/postRoute');

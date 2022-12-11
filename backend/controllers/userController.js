@@ -7,9 +7,8 @@ const cloudinary = require("cloudinary");
 
 exports.register = async (req, res) => {
     try {
-        const { username, name, email, password } = req.body;
+        const { name, email, password, avatar } = req.body;
         let user = await User.findOne({ email });
-        let userId = await User.findOne({ username });
         if (user) {
             return res.status(400).json({
                 success: false,
@@ -17,21 +16,14 @@ exports.register = async (req, res) => {
             });
         }
 
-        if (userId) {
-            return res.status(400).json({
-                success: false,
-                message: 'Username already exists',
-            });
-        }
-
-        const otp = Math.floor(Math.random() * 1000000);
+        // const otp = Math.floor(Math.random() * 1000000);
 
         const myCloud = await cloudinary.v2.uploader.upload(avatar, {
-            folder: "social-media-avatar"
+            folder: 'social-media-avatar',
+            resource_type: 'auto',
         });
 
         user = await User.create({
-            username,
             name,
             email,
             password,
@@ -39,22 +31,21 @@ exports.register = async (req, res) => {
                 public_id: myCloud.public_id,
                 url: myCloud.secure_url,
             },
-            otp,
-            otpExpiry: new Date(
-                Date.now() + process.env.OTP_EXPIRE * 60 * 1000
-            ),
+            // otp,
+            // otpExpiry: new Date(
+            //     Date.now() + process.env.OTP_EXPIRE * 60 * 1000
+            // ),
         });
 
-        await sendEmail({
-            email: user.email,
-            subject: 'OTP for account verification',
-            message: 'Verify Your Account' + `Your OTP is ${otp}`
-        });
+        // await sendEmail({
+        //     email: user.email,
+        //     subject: 'OTP for account verification',
+        //     message: 'Verify Your Account' + `Your OTP is ${otp}`
+        // });
 
         let token = jwt.sign(
             {
                 id: user._id,
-                username: user.username,
                 name: user.name,
                 email: user.email,
                 avatar: user.avatar,
@@ -70,7 +61,7 @@ exports.register = async (req, res) => {
 
         res.status(201).cookie('token', token, options).json({
             success: true,
-            message: 'OTP sent to your mail, please verify!',
+            // message: 'OTP sent to your mail, please verify!',
             user,
         });
     }
@@ -84,11 +75,11 @@ exports.register = async (req, res) => {
 
 exports.verifyAccount = async (req, res, next) => {
     try {
-        console.log("_id", req.user._id);
+        console.log("_id", req.user.id);
         const otp = Number(req.body.otp);
 
 
-        const user = await User.findById(req.user._id);
+        const user = await User.findById(req.user.id);
 
         if (user.otp !== otp || user.otp_expiry < Date.now()) {
             return res.status(400).json({
