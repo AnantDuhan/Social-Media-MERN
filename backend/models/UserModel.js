@@ -41,10 +41,10 @@ const userSchema = new mongoose.Schema({
             ref: 'User',
         },
     ],
-    isVerified: {
-        type: Boolean,
-        default: false,
-    },
+    // isVerified: {
+    //     type: Boolean,
+    //     default: false,
+    // },
     // otp: {
     //     type: Number,
     //     minValue: 1000001,
