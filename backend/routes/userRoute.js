@@ -14,6 +14,7 @@ const {
     resetPassword,
     getMyPosts,
     getUserPosts,
+    verifyAccount,
     isUserBlocked,
 } = require('../controllers/userController');
 const { isAuthenticated } = require('../middlewares/auth');
@@ -24,6 +25,8 @@ router.route('/register').post(register);
 router.route('/login').post(login);
 
 router.route('/logout').get(logout);
+
+router.route('/verify').post(isAuthenticated, verifyAccount)
 
 router.route('/follow/:id').get(isAuthenticated, followUser);
 

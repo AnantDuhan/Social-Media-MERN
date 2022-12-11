@@ -2,30 +2,59 @@ const User = require('../models/UserModel');
 const Post = require('../models/PostModel');
 const { sendEmail } = require('../helper/sendMail');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const cloudinary = require("cloudinary");
 
 exports.register = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { username, name, email, password } = req.body;
         let user = await User.findOne({ email });
-        if (user)
+        let userId = await User.findOne({ username });
+        if (user) {
             return res.status(400).json({
                 success: false,
-                message: 'User already registered'
-            })
-        
+                message: 'User already registered',
+            });
+        }
+
+        if (userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Username already exists',
+            });
+        }
+
+        const otp = Math.floor(Math.random() * 1000000);
+
+        const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+            folder: "social-media-avatar"
+        });
+
         user = await User.create({
+            username,
             name,
             email,
             password,
             avatar: {
-                public_id: "sample id",
-                url: 'sample url'
-            }
+                public_id: myCloud.public_id,
+                url: myCloud.secure_url,
+            },
+            otp,
+            otpExpiry: new Date(
+                Date.now() + process.env.OTP_EXPIRE * 60 * 1000
+            ),
+        });
+
+        await sendEmail({
+            email: user.email,
+            subject: 'OTP for account verification',
+            message: 'Verify Your Account' + `Your OTP is ${otp}`
         });
 
         let token = jwt.sign(
             {
                 id: user._id,
+                username: user.username,
                 name: user.name,
                 email: user.email,
                 avatar: user.avatar,
@@ -39,18 +68,52 @@ exports.register = async (req, res) => {
             httpOnly: true,
         };
 
-        res.status(201).cookie("token", token, options).json({
+        res.status(201).cookie('token', token, options).json({
             success: true,
-            user
-        })
+            message: 'OTP sent to your mail, please verify!',
+            user,
+        });
     }
     catch (err) {
         res.status(500).json({
             success: false,
             message: err.message
-        })
+        });
     }
 };
+
+exports.verifyAccount = async (req, res, next) => {
+    try {
+        console.log("_id", req.user._id);
+        const otp = Number(req.body.otp);
+
+
+        const user = await User.findById(req.user._id);
+
+        if (user.otp !== otp || user.otp_expiry < Date.now()) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid OTP or has been expired',
+            });
+        }
+
+        user.isVerified = true;
+        user.otp = null;
+        user.otp_expiry = null;
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Account Verified',
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+}
 
 exports.login = async (req, res) => {
     
@@ -400,7 +463,7 @@ exports.forgotPassword = async (req, res) => {
     }
 }
 
-exports.resetPassword = async (req, res) => {
+exports.resetPassword = async (req, res, next) => {
     try {
         const resetPasswordToken = crypto
             .createHash('sha256')
@@ -419,10 +482,18 @@ exports.resetPassword = async (req, res) => {
             });
         }
 
+        if (req.body.password !== req.body.confirmPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password does not match!',
+            });
+        }
+
         user.password = req.body.password;
 
         user.resetPasswordToken = undefined;
         user.resetPasswordExpire = undefined;
+
         await user.save();
 
         res.status(200).json({

@@ -4,6 +4,11 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
+    username: {
+        type: String,
+        required: [true, 'Please enter your username'],
+        unique: [true, 'Username already exists'],
+    },
     name: {
         type: String,
         required: [true, 'Please enter your name'],
@@ -21,34 +26,44 @@ const userSchema = new mongoose.Schema({
     },
     avatar: {
         public_id: String,
-        url: String
+        url: String,
     },
     posts: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Post",
+            ref: 'Post',
         },
     ],
     followers: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: 'User',
         },
     ],
     following: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: 'User',
         },
     ],
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
+    otp: {
+        type: Number,
+        minValue: 1000001,
+    },
+    otp_expiry: Date,
     resetPasswordToken: String,
     resetPasswordExpire: Date,
 });
 
 userSchema.pre('save', async function (next) {
-    if (this.isModified('password')) {
-        this.password = await bcrypt.hash(this.password, 10);
-    }
+    if (!this.isModified('password')) return next();
+
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
     next();
 });
 
@@ -66,5 +81,7 @@ userSchema.methods.getResetPasswordToken = function ()  {
 
     return resetToken;
 }
+
+userSchema.index({ otp_expiry: 1 }, { expireAfterSeconds: 0 });
 
 module.exports = mongoose.model('User', userSchema);
